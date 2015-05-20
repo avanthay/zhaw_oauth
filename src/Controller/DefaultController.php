@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 class DefaultController {
 
     private $app;
-    private $accessToken;
 
     public function __construct(Application $app) {
         $this->app = $app;
@@ -26,35 +25,6 @@ class DefaultController {
 
     public function homeAction() {
         return $this->app['twig']->render('home.twig', array());
-    }
-
-    public function customGoogleAction() {
-        $code = $this->app['request']->query->get('code');
-        if ($code) {
-            $ch = curl_init('https://www.googleapis.com/oauth2/v3/token');
-            curl_setopt_array($ch, array(
-                CURLOPT_POST           => true,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POSTFIELDS     => http_build_query(array(
-                    'code'          => $code,
-                    'client_id'     => '843355983392-cdvc45m9dsq8qk6lnaa1u1nmslp6ae58.apps.googleusercontent.com',
-                    'client_secret' => '47U1ohqOBr2aw9ISElhKohG0',
-                    'redirect_uri'  => 'http://localhost:8080/google',
-                    'grant_type'    => 'authorization_code'
-                ))
-            ));
-            $exec = curl_exec($ch);
-            curl_close($ch);
-
-            $response = json_decode($exec, true);
-
-            if ($response && $response['access_token']) {
-                $this->accessToken = $response['access_token'];
-            }
-
-            return $exec;
-        }
-        return $this->app['twig']->render('google.twig', array('params' => $this->app['request']->query));
     }
 
     public function googleAction() {
