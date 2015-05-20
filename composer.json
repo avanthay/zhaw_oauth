@@ -1,0 +1,11 @@
+{
+    "name": "dave's oauth app",
+    "require": {
+        "silex/silex": "~1.2",
+        "twig/twig": "^1.18",
+        "league/oauth2-client": "^0.11.0"
+    },
+    "autoload": {
+        "psr-4": {"Dave\\": "src/"}
+    }
+}

@@ -1,0 +1,31 @@
+{% extends 'base.twig' %}
+
+{% block content %}
+    <p>You where successfuly authorized by the Google Oauth2 API. That are your personal information:</p>
+    <div>
+        <ul>
+            <li>Image: <img src="{{ user.imageUrl }}"/></li>
+            <li>UID: {{ user.uid }}</li>
+            <li>Name: {{ user.name }}</li>
+            <li>Email: {{ user.email }}</li>
+        </ul>
+
+        <p>And your 5 last emails:</p>
+        
+        <ul>
+            {# TODO show mails (get mail subject) #}
+            {% for mail in mails %}
+                <li>
+                    <h4>Mail id: {{ mail.id }}</h4>
+                    <ul>
+                        <li>From: {{ mail.from }}</li>
+                        <li>To: {{ mail.to }}</li>
+                        <li>Date: {{ mail.date }}</li>
+                        <li>Subject: {{ mail.subject }}</li>
+                        <li>Body (Snippet): {{ mail.snippet }}</li>
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock content %}
