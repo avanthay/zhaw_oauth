@@ -1,4 +1,12 @@
 <?php
+/**
+ * Class DefaultController
+ * @package Dave\Controller
+ *
+ * @author  Dave Avanthay <dave@avanthay.ch>
+ * @version 1.0
+ */
+
 
 namespace Dave\Controller;
 

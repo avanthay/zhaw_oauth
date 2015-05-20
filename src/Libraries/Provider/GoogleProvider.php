@@ -1,4 +1,12 @@
 <?php
+/**
+ * Class GoogleProvider
+ * @package Dave\Libraries\Provider
+ *
+ * @author  Dave Avanthay <dave@avanthay.ch>
+ * @version 1.0
+ */
+
 
 namespace Dave\Libraries\Provider;
 

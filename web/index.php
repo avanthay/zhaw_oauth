@@ -1,4 +1,11 @@
 <?php
+/**
+ * File index.php
+ *
+ * @author  Dave Avanthay <dave@avanthay.ch>
+ * @version 1.0
+ */
+
 
 use Dave\Controller\DefaultController;
 use Silex\Application;
