@@ -1,0 +1,19 @@
+{% extends 'base.twig' %}
+
+{% block pageHeader %}
+    <h1>Authorize</h1>
+{% endblock pageHeader %}
+
+{% block content %}
+    <h3>Authorize a third party application to access your data</h3>
+    <p>{{ auth.client }} would like to access to:</p>
+    <ul>
+        {% for scope in auth.scope %}
+            <li>{{ scope.name }}: {{ scope.description }}</li>
+        {% endfor %}
+    </ul>
+    <form method="post">
+        <input type="submit" class="btn btn-default" value="Deny" name="authorization">
+        <input type="submit" class="btn btn-primary" value="Approve" name="authorization">
+    </form>
+{% endblock content %}

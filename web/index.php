@@ -25,6 +25,7 @@ use Silex\Provider\SecurityServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 $loader = require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -41,7 +42,7 @@ $app->register(new SessionServiceProvider());
 $app->register(new SecurityServiceProvider(), array(
     'security.firewalls' => array(
         'admin'   => array(
-            'pattern' => '^/admin',
+            'pattern' => '(^/admin|^/oauth/authorize)',
             'form'    => array('login_path' => '/login', 'check_path' => '/admin/login_check'),
             'logout'  => array('logout_path' => '/admin/logout'),
             'users'   => array(
@@ -106,5 +107,9 @@ $app->get('/google', 'Dave\Controller\DefaultController::googleAction')->bind('g
 $app->get('/login', 'Dave\Controller\SecurityController::loginAction')->bind('login');
 
 $app->get('/admin', 'Dave\Controller\AdminController::adminAction')->bind('admin');
+
+$app->get('/oauth', function() use ($app) { return new RedirectResponse($app['url_generator']->generate('home')); });
+$app->get('/oauth/authorize', 'Dave\Controller\AuthorizationController::authorizeAction')->bind('authorize');
+$app->get('/oauth/token', 'Dave\Controller\AuthorizationController::accessTokenAction')->bind('accessToken');
 
 $app->run();
