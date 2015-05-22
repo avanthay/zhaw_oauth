@@ -1,14 +1,18 @@
 {% extends 'base.twig' %}
 
+{% block pageHeader %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
 {% block content %}
-    <h1>Dave's oauth 2.0 app</h1>
-    <p>Welcome to Dave's oauth 2.0 app!</p>
-    <p>Choose an option:</p>
+    <h3>Welcome to Dave's oauth 2.0 app!</h3>
+    <p>Choose an action:</p>
     <ul>
-        <li><a href="{# TODO create link #}">List your 5 last tweets from Twitter</a></li>
-        <li><a href="/google">List your personal information and the last 5 emails from Gmail</a></li>
-        <li><a href="{# TODO create link #}">Show your 5 last posts from Facebook</a></li>
-        <li><a href="{# TODO create link #}">Show your 5 last commits from GitHub</a></li>
+        {% include 'snippets/actions.twig' %}
+    </ul>
+    <p>OR</p>
+    <ul>
+        <li><a href="{{ path('admin') }}">Go to the secured area</a></li>
     </ul>
 
 {% endblock content %}

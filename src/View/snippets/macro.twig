@@ -1,0 +1,5 @@
+{% macro isActive(currentPath) %}
+    {% if app.request.pathInfo == currentPath %}
+        {{ ' class="active"' }}
+    {% endif %}
+{% endmacro %}

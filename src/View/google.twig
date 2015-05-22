@@ -1,7 +1,11 @@
 {% extends 'base.twig' %}
 
+{% block pageHeader %}
+    <h1>Google</h1>
+{% endblock pageHeader %}
+
 {% block content %}
-    <p>You where successfuly authorized by the Google Oauth2 API. That are your personal information:</p>
+    <p>You where successfuly authorized by the Google Oauth2 API. Here are your personal information:</p>
     <div>
         <ul>
             <li>Image: <img src="{{ user.imageUrl }}"/></li>
@@ -11,9 +15,8 @@
         </ul>
 
         <p>And your 5 last emails:</p>
-        
+
         <ul>
-            {# TODO show mails (get mail subject) #}
             {% for mail in mails %}
                 <li>
                     <h4>Mail id: {{ mail.id }}</h4>

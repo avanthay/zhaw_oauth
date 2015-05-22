@@ -1,0 +1,19 @@
+{% extends 'base.twig' %}
+
+{% block pageHeader %}
+    <h1>Secured area</h1>
+{% endblock pageHeader %}
+
+{% block content %}
+
+    <h3>Welcome to the secured area!</h3>
+
+    <p>Your username is: <b>{{ user.username }}</b></p>
+    <p>Your encrypted password is: <b>{{ user.password }}</b></p>
+    <p>Your roles are:</p>
+    <ul>
+        {% for role in user.roles %}
+            <li>{{ role }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
