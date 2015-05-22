@@ -15,16 +15,10 @@ use Silex\Application;
 
 class SecurityController {
 
-    private $app;
-
-    public function __construct(Application $app) {
-        $this->app = $app;
-    }
-
-    public function loginAction() {
-        return $this->app['twig']->render('login.twig', array(
-            'error'         => $this->app['security.last_error']($this->app['request']),
-            'last_username' => $this->app['session']->get('_security.last_username'),
+    public function loginAction(Application $app) {
+        return $app['twig']->render('login.twig', array(
+            'error'         => $app['security.last_error']($app['request']),
+            'last_username' => $app['session']->get('_security.last_username'),
         ));
     }
 

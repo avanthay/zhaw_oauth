@@ -15,15 +15,9 @@ use Silex\Application;
 
 class AdminController {
 
-    private $app;
-
-    public function __construct(Application $app){
-        $this->app = $app;
-    }
-
-    public function adminAction() {
-        return $this->app['twig']->render('admin.twig', array(
-            'user' => $this->app['security']->getToken()->getUser()
+    public function adminAction(Application $app) {
+        return $app['twig']->render('admin.twig', array(
+            'user' => $app['security']->getToken()->getUser()
         ));
     }
 

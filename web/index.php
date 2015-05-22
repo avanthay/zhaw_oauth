@@ -6,13 +6,18 @@
  * @version 1.0
  */
 
-use Dave\Controller\AdminController;
-use Dave\Controller\DefaultController;
-use Dave\Controller\SecurityController;
+use Dave\Libraries\OAuth2Server\AccessTokenStorage;
+use Dave\Libraries\OAuth2Server\AuthCodeStorage;
+use Dave\Libraries\OAuth2Server\ClientStorage;
+use Dave\Libraries\OAuth2Server\ScopeStorage;
+use Dave\Libraries\OAuth2Server\SessionStorage;
 use Dflydev\Silex\Provider\DoctrineOrm\DoctrineOrmServiceProvider;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\ORM\Tools\SchemaTool;
+use League\OAuth2\Server\AuthorizationServer;
+use League\OAuth2\Server\Grant\AuthCodeGrant;
+use League\OAuth2\Server\ResourceServer;
 use Silex\Application;
 use Silex\Provider\DoctrineServiceProvider;
 use Silex\Provider\FormServiceProvider;
@@ -80,20 +85,26 @@ $schemaTool = new SchemaTool($app['orm.em']);
 $schemaTool->updateSchema($app['orm.em']->getMetadataFactory()->getAllMetadata());
 
 
-$app['controller.default'] = $app->share(function () use ($app) {
-    return new DefaultController($app);
+$app['oauth.server.authorization'] = $app->share(function () use ($app) {
+    $server = new AuthorizationServer();
+    $server->setSessionStorage(new SessionStorage($app));
+    $server->setAccessTokenStorage(new AccessTokenStorage($app));
+    $server->setClientStorage(new ClientStorage($app));
+    $server->setScopeStorage(new ScopeStorage($app));
+    $server->setAuthCodeStorage(new AuthCodeStorage($app));
+    $server->addGrantType(new AuthCodeGrant());
+    return $server;
 });
-$app->get('/', 'controller.default:homeAction')->bind('home');
-$app->get('/google', 'controller.default:googleAction')->bind('google');
+$app['oauth.server.resource'] = $app->share(function () use ($app) {
+    return new ResourceServer(new SessionStorage($app), new AccessTokenStorage($app), new ClientStorage($app), new ScopeStorage($app));
+});
 
-$app['controller.security'] = $app->share(function () use ($app) {
-    return new SecurityController($app);
-});
-$app->get('/login', 'controller.security:loginAction')->bind('login');
 
-$app['controller.admin'] = $app->share(function () use ($app) {
-    return new AdminController($app);
-});
-$app->get('/admin', 'controller.admin:adminAction')->bind('admin');
+$app->get('/', 'Dave\Controller\DefaultController::homeAction')->bind('home');
+$app->get('/google', 'Dave\Controller\DefaultController::googleAction')->bind('google');
+
+$app->get('/login', 'Dave\Controller\SecurityController::loginAction')->bind('login');
+
+$app->get('/admin', 'Dave\Controller\AdminController::adminAction')->bind('admin');
 
 $app->run();
