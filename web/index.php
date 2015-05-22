@@ -6,18 +6,22 @@
  * @version 1.0
  */
 
-
 use Dave\Controller\AdminController;
 use Dave\Controller\DefaultController;
 use Dave\Controller\SecurityController;
+use Dflydev\Silex\Provider\DoctrineOrm\DoctrineOrmServiceProvider;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use Doctrine\ORM\Tools\SchemaTool;
 use Silex\Application;
+use Silex\Provider\DoctrineServiceProvider;
 use Silex\Provider\FormServiceProvider;
 use Silex\Provider\SecurityServiceProvider;
 use Silex\Provider\SessionServiceProvider;
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
 
-require_once __DIR__ . '/../vendor/autoload.php';
+$loader = require_once __DIR__ . '/../vendor/autoload.php';
 
 
 $app = new Application();
@@ -28,16 +32,17 @@ $app->register(new TwigServiceProvider(), array('twig.path' => __DIR__ . '/../sr
 $app->register(new UrlGeneratorServiceProvider());
 $app->register(new FormServiceProvider());
 $app->register(new SessionServiceProvider());
+
 $app->register(new SecurityServiceProvider(), array(
     'security.firewalls' => array(
         'admin'   => array(
             'pattern' => '^/admin',
-            'form' => array('login_path' => '/login', 'check_path' => '/admin/login_check'),
-            'logout' => array('logout_path' => '/admin/logout'),
+            'form'    => array('login_path' => '/login', 'check_path' => '/admin/login_check'),
+            'logout'  => array('logout_path' => '/admin/logout'),
             'users'   => array(
                 // raw password is foo
                 'admin' => array('ROLE_ADMIN', '5FZ2Z8QIkA7UTZ4BYkoC+GsReLf569mSKDsfods6LYQ8t+a8EW9oaircfMpmaLbPBh4FOBiiFyLfuZmTSUwzZg=='),
-                'user' => array('ROLE_USER', '5FZ2Z8QIkA7UTZ4BYkoC+GsReLf569mSKDsfods6LYQ8t+a8EW9oaircfMpmaLbPBh4FOBiiFyLfuZmTSUwzZg==')
+                'user'  => array('ROLE_USER', '5FZ2Z8QIkA7UTZ4BYkoC+GsReLf569mSKDsfods6LYQ8t+a8EW9oaircfMpmaLbPBh4FOBiiFyLfuZmTSUwzZg==')
             )
         ),
         'default' => array(
@@ -45,6 +50,34 @@ $app->register(new SecurityServiceProvider(), array(
         )
     )
 ));
+
+$app->register(new DoctrineServiceProvider(), array(
+    'db.options' => array(
+        'driver'   => 'pdo_mysql',
+        'host'     => 'localhost',
+        'dbname'   => 'oauth_app',
+        'user'     => 'php',
+        'password' => 'password'
+    )
+));
+$app->register(new DoctrineOrmServiceProvider(), array(
+    'orm.em.options' => array(
+        'mappings' => array(
+            array(
+                'type'                         => 'annotation',
+                'namespace'                    => 'Dave\Entity',
+                'path'                         => __DIR__ . '/../src/Entity',
+                'use_simple_annotation_reader' => false
+            )
+        )
+    )
+));
+AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
+AnnotationReader::addGlobalIgnoredName('type');
+
+//TODO update schema conditionally
+$schemaTool = new SchemaTool($app['orm.em']);
+$schemaTool->updateSchema($app['orm.em']->getMetadataFactory()->getAllMetadata());
 
 
 $app['controller.default'] = $app->share(function () use ($app) {
