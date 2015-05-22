@@ -1,14 +1,14 @@
 <?php
 /**
  * Class GoogleProvider
- * @package Dave\Libraries\Provider
+ * @package Dave\Libraries\OAuth2Client
  *
  * @author  Dave Avanthay <dave@avanthay.ch>
  * @version 1.0
  */
 
 
-namespace Dave\Libraries\Provider;
+namespace Dave\Libraries\OAuth2Client;
 
 
 use League\OAuth2\Client\Provider\Google;

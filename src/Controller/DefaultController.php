@@ -11,7 +11,7 @@
 namespace Dave\Controller;
 
 
-use Dave\Libraries\Provider\GoogleProvider;
+use Dave\Libraries\OAuth2Client\GoogleProvider;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 
