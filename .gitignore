@@ -4,3 +4,4 @@ vendor/
 
 # Files
 web/.htaccess
+.DS_Store
