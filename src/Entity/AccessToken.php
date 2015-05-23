@@ -29,7 +29,7 @@ class AccessToken extends AccessTokenEntity {
 
     /**
      * @type Session
-     * @ORM\OneToOne(targetEntity="Session", inversedBy="accessToken")
+     * @ORM\OneToOne(targetEntity="Session", mappedBy="accessToken")
      */
     protected $session;
     

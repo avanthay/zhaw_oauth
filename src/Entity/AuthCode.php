@@ -35,7 +35,7 @@ class AuthCode extends AuthCodeEntity {
 
     /**
      * @type Session
-     * @ORM\OneToOne(targetEntity="Session", inversedBy="authCode")
+     * @ORM\OneToOne(targetEntity="Session", mappedBy="authCode")
      */
     protected $session;
 

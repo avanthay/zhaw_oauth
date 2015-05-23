@@ -46,7 +46,7 @@ class Client extends ClientEntity {
 
     /**
      * @type Session
-     * @ORM\OneToOne(targetEntity="Session", inversedBy="client")
+     * @ORM\OneToOne(targetEntity="Session", mappedBy="client")
      */
     protected $session;
 
