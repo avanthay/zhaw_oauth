@@ -2,6 +2,7 @@
 
 {% import 'snippets/macro.twig' as func %}
 
+<li {{ isNav is defined ? func.isActive(path('ownServer')) : '' }}><a href="{{ path('ownServer') }}">Show profile and mail from own API</a></li>
 <li ><a href="{# TODO create link #}">List your 5 last tweets from Twitter</a></li>
 <li {{ isNav is defined ? func.isActive(path('google')) : '' }}><a href="{{ path('google') }}">List your personal information and the last 5 emails from Gmail</a></li>
 <li><a href="{# TODO create link #}">Show your 5 last posts from Facebook</a></li>

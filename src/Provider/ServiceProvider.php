@@ -44,6 +44,7 @@ class ServiceProvider implements ServiceProviderInterface {
 
         /* third party service providers */
         $app->register(new DoctrineOrmServiceProvider(), array(
+            'orm.proxies_dir' => __DIR__ . '/../../app/cache/doctrine/proxy',
             'orm.em.options' => array(
                 'mappings' => array(
                     array(

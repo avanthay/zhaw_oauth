@@ -7,9 +7,9 @@ use League\OAuth2\Server\Exception\AccessDeniedException;
 use League\OAuth2\Server\Exception\OAuthException;
 use League\OAuth2\Server\Util\RedirectUri;
 use Silex\Application;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 
 /**
@@ -29,7 +29,7 @@ class AuthorizationController {
                 return new RedirectResponse($e->getRedirectUri());
             }
 
-            return new Response(json_encode(array('error' => $e->errorType, 'message' => $e->getMessage())), $e->httpStatusCode, $e->getHttpHeaders());
+            return new JsonResponse(array('error' => $e->errorType, 'message' => $e->getMessage()), $e->httpStatusCode, $e->getHttpHeaders());
         }
 
         if ($authForm = $request->request->get('authorization')) {
@@ -45,18 +45,18 @@ class AuthorizationController {
             )));
         }
 
-        return $app['twig']->render('authorize.twig', array('auth' => $auth));
+        return $app['twig']->render('authorize.twig', array('client' => $auth['client']));
     }
 
     public function accessTokenAction(Application $app) {
         try {
-            return new Response(json_encode($app['oauth.server.authorization']->issueAccessToken()), 200, array(
+            return new JsonResponse($app['oauth.server.authorization']->issueAccessToken(), 200, array(
                 'Content-type'  => 'application/json',
                 'Cache-Control' => 'no-store',
                 'Pragma'        => 'no-store'
             ));
         } catch (OAuthException $e) {
-            return new Response(json_encode(array('error' => $e->errorType, 'message' => $e->getMessage())), $e->httpStatusCode, $e->getHttpHeaders());
+            return new JsonResponse(array('error' => $e->errorType, 'message' => $e->getMessage()), $e->httpStatusCode, $e->getHttpHeaders());
         }
     }
 

@@ -39,12 +39,6 @@ class Client extends ClientEntity {
     protected $name;
 
     /**
-     * @type string
-     * @ORM\Column(type="string", length=1000, nullable=true)
-     */
-    protected $redirectUri;
-
-    /**
      * @type Session
      * @ORM\OneToOne(targetEntity="Session", mappedBy="client")
      */
@@ -94,20 +88,6 @@ class Client extends ClientEntity {
      */
     public function setName($name) {
         $this->name = $name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRedirectUri() {
-        return $this->redirectUri;
-    }
-
-    /**
-     * @param string $redirectUri
-     */
-    public function setRedirectUri($redirectUri) {
-        $this->redirectUri = $redirectUri;
     }
 
     /**

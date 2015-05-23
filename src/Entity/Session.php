@@ -41,7 +41,7 @@ class Session extends SessionEntity {
     protected $ownerId;
 
     /**
-     * @type string
+     * @type Client
      * @ORM\OneToOne(targetEntity="Client", inversedBy="session", cascade={"persist", "remove"})
      */
     protected $client;
@@ -71,7 +71,7 @@ class Session extends SessionEntity {
     protected $scopes;
 
 
-    public function __construct(AbstractServer $server, $ownerType, $ownerId, $client, $clientRedirectUri) {
+    public function __construct(AbstractServer $server, $ownerType, $ownerId, Client $client, $clientRedirectUri) {
         $this->ownerType = $ownerType;
         $this->ownerId = $ownerId;
         $this->client = $client;
@@ -82,10 +82,12 @@ class Session extends SessionEntity {
 
     public function addScope(Scope $scope) {
         $this->scopes->add($scope);
+        $scope->setSession($this);
     }
 
     public function removeScope(Scope $scope) {
         $this->scopes->removeElement($scope);
+        $scope->setSession(null);
     }
 
     public function associateScope(ScopeEntity $scope) {
@@ -141,14 +143,14 @@ class Session extends SessionEntity {
     }
 
     /**
-     * @return string
+     * @return Client
      */
     public function getClient() {
         return $this->client;
     }
 
     /**
-     * @param string $client
+     * @param Client $client
      */
     public function setClient($client) {
         $this->client = $client;

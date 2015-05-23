@@ -21,9 +21,9 @@ use League\OAuth2\Server\Entity\ScopeEntity;
 class AuthCode extends AuthCodeEntity {
 
     /**
-     * @var int
+     * @var string
      * @ORM\Id()
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
     protected $id;
 
@@ -34,8 +34,14 @@ class AuthCode extends AuthCodeEntity {
     protected $redirectUri;
 
     /**
+     * @type int
+     * @ORM\Column(type="integer")
+     */
+    protected $expireTime;
+
+    /**
      * @type Session
-     * @ORM\OneToOne(targetEntity="Session", mappedBy="authCode")
+     * @ORM\OneToOne(targetEntity="Session", mappedBy="authCode", cascade={"persist"})
      */
     protected $session;
 
@@ -44,12 +50,13 @@ class AuthCode extends AuthCodeEntity {
         $this->setId($token);
         $this->setExpireTime($expireTime);
         $this->setSession($session);
+        $session->setAuthCode($this);
         $this->setRedirectUri($redirectUri);
         parent::__construct($server);
     }
 
     public function getScopes() {
-        $this->session->getScopes();
+        return $this->session->getScopes();
     }
 
     public function getSession() {
@@ -64,5 +71,9 @@ class AuthCode extends AuthCodeEntity {
         }
 
         return $this;
+    }
+
+    public function setServer(AbstractServer $server) {
+        $this->server = $server;
     }
 }

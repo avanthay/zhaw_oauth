@@ -4,6 +4,7 @@
 namespace Dave\Libraries\OAuth2Server;
 
 use Dave\Entity\AccessToken;
+use Dave\Entity\Scope;
 use League\OAuth2\Server\Entity\AccessTokenEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Storage\AbstractStorage;
@@ -22,7 +23,7 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
 
     private $app;
 
-    public function __construct(Application $app){
+    public function __construct(Application $app) {
         $this->app = $app;
     }
 
@@ -34,7 +35,12 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
      * @return \League\OAuth2\Server\Entity\AccessTokenEntity | null
      */
     public function get($token) {
-        return $this->app['orm.em']->getRepository('Dave\Entity\AccessToken')->find($token);
+        $accessToken = $this->app['orm.em']->getRepository('Dave\Entity\AccessToken')->find($token);
+        if ($accessToken) {
+            $accessToken->setServer($this->server);
+            return $accessToken;
+        }
+        return null;
     }
 
     /**
@@ -45,6 +51,10 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
      * @return \League\OAuth2\Server\Entity\ScopeEntity[] Array of \League\OAuth2\Server\Entity\ScopeEntity
      */
     public function getScopes(AccessTokenEntity $token) {
+        if (!$token instanceof AccessToken) {
+            $token = $this->app['orm.em']->getRepository('Dave\Entity\AccessToken')->find($token->getId());
+        }
+
         return $token->getScopes();
     }
 
@@ -59,10 +69,14 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
      */
     public function create($token, $expireTime, $sessionId) {
         $session = $this->app['orm.em']->getRepository('Dave\Entity\Session')->find($sessionId);
-        $accessToken = new AccessToken($this->getServer(), $token, $expireTime, $session);
+        $accessToken = $this->app['orm.em']->getRepository('Dave\Entity\AccessToken')->find($token);
 
-        $this->app['orm.em']->persist($accessToken);
-        $this->app['orm.em']->flush();
+        if (!$accessToken) {
+            $accessToken = new AccessToken($this->getServer(), $token, $expireTime, $session);
+
+            $this->app['orm.em']->persist($accessToken);
+            $this->app['orm.em']->flush();
+        }
     }
 
     /**
@@ -74,6 +88,13 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
      * @return void
      */
     public function associateScope(AccessTokenEntity $token, ScopeEntity $scope) {
+        if (!$token instanceof AccessToken) {
+            $token = $this->app['orm.em']->getRepository('Dave\Entity\AccessToken')->find($token->getId());
+        }
+        if (!$scope instanceof Scope) {
+            $scope = $this->app['orm.em']->getRepository('Dave\Entity\Scope')->find($scope->getId());
+        }
+
         $token->associateScope($scope);
 
         $this->app['orm.em']->persist($token);
@@ -88,6 +109,10 @@ class AccessTokenStorage extends AbstractStorage implements AccessTokenInterface
      * @return void
      */
     public function delete(AccessTokenEntity $token) {
+        if (!$token instanceof AccessToken) {
+            $token = $this->app['orm.em']->getRepository('Dave\Entity\AccessToken')->find($token->getId());
+        }
+
         $this->app['orm.em']->remove($token);
         $this->app['orm.em']->flush();
     }

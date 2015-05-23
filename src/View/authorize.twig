@@ -6,9 +6,9 @@
 
 {% block content %}
     <h3>Authorize a third party application to access your data</h3>
-    <p>{{ auth.client }} would like to access to:</p>
+    <p>{{ client.name }} would like to access to:</p>
     <ul>
-        {% for scope in auth.scope %}
+        {% for scope in client.session.scopes %}
             <li>{{ scope.name }}: {{ scope.description }}</li>
         {% endfor %}
     </ul>

@@ -11,7 +11,6 @@ use Dave\Libraries\OAuth2Server\SessionStorage;
 use Dave\Provider\ControllerProvider;
 use Dave\Provider\ServiceProvider;
 use Dave\Provider\UserProvider;
-use Doctrine\ORM\Tools\SchemaTool;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\Grant\AuthCodeGrant;
 use League\OAuth2\Server\ResourceServer;
@@ -56,8 +55,8 @@ class App extends Application {
         ));
 
 //TODO update schema conditionally
-        $schemaTool = new SchemaTool($this['orm.em']);
-        $schemaTool->updateSchema($this['orm.em']->getMetadataFactory()->getAllMetadata());
+//        $schemaTool = new SchemaTool($this['orm.em']);
+//        $schemaTool->updateSchema($this['orm.em']->getMetadataFactory()->getAllMetadata());
 
 
         $this['oauth.server.authorization'] = $this->share(function () use ($app) {

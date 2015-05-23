@@ -21,15 +21,21 @@ use League\OAuth2\Server\Entity\ScopeEntity;
 class AccessToken extends AccessTokenEntity {
 
     /**
-     * @type int
+     * @type string
      * @ORM\Id
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
     protected $id;
 
     /**
+     * @type int
+     * @ORM\Column(type="integer")
+     */
+    protected $expireTime;
+
+    /**
      * @type Session
-     * @ORM\OneToOne(targetEntity="Session", mappedBy="accessToken")
+     * @ORM\OneToOne(targetEntity="Session", mappedBy="accessToken", cascade={"persist", "remove"})
      */
     protected $session;
     
@@ -37,6 +43,7 @@ class AccessToken extends AccessTokenEntity {
         $this->setId($token);
         $this->setExpireTime($expireTime);
         $this->setSession($session);
+        $session->setAccessToken($this);
         parent::__construct($server);
     }
 
@@ -56,6 +63,10 @@ class AccessToken extends AccessTokenEntity {
         }
 
         return $this;
+    }
+
+    public function setServer(AbstractServer $server){
+        $this->server = $server;
     }
 
 }

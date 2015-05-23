@@ -4,6 +4,7 @@
 namespace Dave\Libraries\OAuth2Server;
 
 use Dave\Entity\AuthCode;
+use Dave\Entity\Scope;
 use League\OAuth2\Server\Entity\AuthCodeEntity;
 use League\OAuth2\Server\Entity\ScopeEntity;
 use League\OAuth2\Server\Storage\AbstractStorage;
@@ -35,6 +36,7 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface {
      */
     public function get($code) {
         $authCode = $this->app['orm.em']->getRepository('Dave\Entity\AuthCode')->find($code);
+        $authCode->setServer($this->server);
         return $authCode;
     }
 
@@ -50,10 +52,14 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface {
      */
     public function create($token, $expireTime, $sessionId, $redirectUri) {
         $session = $this->app['orm.em']->getRepository('Dave\Entity\Session')->find($sessionId);
-        $authCode = new AuthCode($this->getServer(), $token, $expireTime, $session, $redirectUri);
+        $authCode = $this->app['orm.em']->getRepository('Dave\Entity\AuthCode')->find($token);
 
-        $this->app['orm.em']->persist($authCode);
-        $this->app['orm.em']->flush();
+        if (!$authCode) {
+            $authCode = new AuthCode($this->getServer(), $token, $expireTime, $session, $redirectUri);
+
+            $this->app['orm.em']->persist($authCode);
+            $this->app['orm.em']->flush();
+        }
     }
 
     /**
@@ -64,6 +70,9 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface {
      * @return \League\OAuth2\Server\Entity\ScopeEntity[] Array of \League\OAuth2\Server\Entity\ScopeEntity
      */
     public function getScopes(AuthCodeEntity $token) {
+        if (!$token instanceof AuthCode) {
+            $token = $this->app['orm.em']->getRepository('Dave\Entity\AuthCode')->find($token->getId());
+        }
         return $token->getScopes();
     }
 
@@ -76,6 +85,13 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface {
      * @return void
      */
     public function associateScope(AuthCodeEntity $token, ScopeEntity $scope) {
+        if (!$token instanceof AuthCode) {
+            $token = $this->app['orm.em']->getRepository('Dave\Entity\AuthCode')->find($token->getId());
+        }
+        if (!$scope instanceof Scope) {
+            $scope = $this->app['orm.em']->getRepository('Dave\Entity\Scope')->find($scope->getId());
+        }
+
         $token->associateScope($scope);
 
         $this->app['orm.em']->persist($token);
@@ -90,6 +106,12 @@ class AuthCodeStorage extends AbstractStorage implements AuthCodeInterface {
      * @return void
      */
     public function delete(AuthCodeEntity $token) {
+        if (!$token instanceof AuthCode) {
+            $token = $this->app['orm.em']->getRepository('Dave\Entity\AuthCode')->find($token->getId());
+        }
+        $token->getSession()->setAuthCode(null);
+        $token->setSession = null;
+
         $this->app['orm.em']->remove($token);
         $this->app['orm.em']->flush();
     }

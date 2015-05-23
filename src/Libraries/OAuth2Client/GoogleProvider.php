@@ -17,7 +17,7 @@ use League\OAuth2\Client\Token\AccessToken;
 class GoogleProvider extends Google {
 
     public function getUserEmails(AccessToken $token) {
-        $url = 'https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=5';
+        $url = 'https://www.googleapis.com/gmail/v1/users/me/messages?maxResults=5&labelIds=Label_1';
         $messageUrl = 'https://www.googleapis.com/gmail/v1/users/me/messages/';
 
         $response = $this->fetchProviderData($url, $this->getHeaders($token));

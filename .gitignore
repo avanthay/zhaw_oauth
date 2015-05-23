@@ -1,6 +1,7 @@
 # Directories
 .idea/
 vendor/
+app/cache/
 
 # Files
 web/.htaccess

@@ -1,0 +1,21 @@
+{% extends 'base.twig' %}
+
+{% block pageHeader %}
+    <h1>Own API</h1>
+{% endblock pageHeader %}
+
+{% block content %}
+    <p>You where successfuly authorized by Dave's OAuth 2.0 API. Here are your personal information:</p>
+    <div>
+        <ul>
+            <li>UID: {{ user.id }}</li>
+            <li>Username: {{ user.username }}</li>
+            {% if user.name is defined %}
+                <li>Name: {{ user.name }}</li>
+            {% endif %}
+            {% if user.email is defined %}
+                <li>Email: {{ user.email }}</li>
+            {% endif %}
+        </ul>
+    </div>
+{% endblock content %}

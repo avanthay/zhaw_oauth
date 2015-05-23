@@ -4,7 +4,6 @@
         "silex/silex": "~1.2",
         "twig/twig": "^1.18",
         "league/oauth2-client": "^0.11.0",
-        "jasongrimes/silex-simpleuser": "^2.0",
         "symfony/security": "^2.6",
         "symfony/form": "^2.6",
         "symfony/twig-bridge": "^2.6",

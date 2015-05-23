@@ -11,6 +11,9 @@
 namespace Dave\Libraries\OAuth2Server;
 
 
+use Dave\Entity\AccessToken;
+use Dave\Entity\AuthCode;
+use Dave\Entity\Scope;
 use Dave\Entity\Session;
 use League\OAuth2\Server\Entity\AccessTokenEntity;
 use League\OAuth2\Server\Entity\AuthCodeEntity;
@@ -36,6 +39,9 @@ class SessionStorage extends AbstractStorage implements SessionInterface {
      * @return \League\OAuth2\Server\Entity\SessionEntity | null
      */
     public function getByAccessToken(AccessTokenEntity $accessToken) {
+        if (!$accessToken instanceof AccessToken) {
+            $accessToken = $this->app['orm.em']->getRepository('Dave\Entity\AccessToken')->find($accessToken->getId());
+        }
         return $accessToken->getSession();
     }
 
@@ -47,6 +53,9 @@ class SessionStorage extends AbstractStorage implements SessionInterface {
      * @return \League\OAuth2\Server\Entity\SessionEntity | null
      */
     public function getByAuthCode(AuthCodeEntity $authCode) {
+        if (!$authCode instanceof AuthCode) {
+            $authCode = $this->app['orm.em']->getRepository('Dave\Entity\AuthCode')->find($authCode->getId());
+        }
         return $authCode->getSession();
     }
 
@@ -58,6 +67,9 @@ class SessionStorage extends AbstractStorage implements SessionInterface {
      * @return \League\OAuth2\Server\Entity\ScopeEntity[] Array of \League\OAuth2\Server\Entity\ScopeEntity
      */
     public function getScopes(SessionEntity $session) {
+        if (!$session instanceof Session) {
+            $session = $this->app['orm.em']->getRepository('Dave\Entity\Session')->find($session->getId());
+        }
         return $session->getScopes();
     }
 
@@ -73,10 +85,15 @@ class SessionStorage extends AbstractStorage implements SessionInterface {
      */
     public function create($ownerType, $ownerId, $clientId, $clientRedirectUri = null) {
         $client = $this->app['orm.em']->getRepository('Dave\Entity\Client')->find($clientId);
-        $session = new Session($this->getServer(), $ownerType, $ownerId, $client, $clientRedirectUri);
+        $session = $this->app['orm.em']->getRepository('Dave\Entity\Session')->findOneBy(array('client' => $client, 'ownerId' => $ownerId));
 
-        $this->app['orm.em']->persist($session);
-        $this->app['orm.em']->flush();
+        if (!$session) {
+            $session = new Session($this->getServer(), $ownerType, $ownerId, $client, $clientRedirectUri);
+
+            $this->app['orm.em']->persist($session);
+            $this->app['orm.em']->flush();
+        }
+
 
         return $session->getId();
     }
@@ -90,6 +107,12 @@ class SessionStorage extends AbstractStorage implements SessionInterface {
      * @return void
      */
     public function associateScope(SessionEntity $session, ScopeEntity $scope) {
+        if (!$session instanceof Session) {
+            $session = $this->app['orm.em']->getRepository('Dave\Entity\Session')->find($session->getId());
+        }
+        if (!$scope instanceof Scope) {
+            $scope = $this->app['orm.em']->getRepository('Dave\Entity\Scope')->find($scope->getId());
+        }
         $session->associateScope($scope);
 
         $this->app['orm.em']->persist($session);

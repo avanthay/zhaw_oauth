@@ -12,6 +12,7 @@ namespace Dave\Controller;
 
 
 use Dave\Libraries\OAuth2Client\GoogleProvider;
+use Dave\Libraries\OAuth2Client\OwnServerProvider;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 
@@ -19,6 +20,36 @@ class DefaultController {
 
     public function homeAction(Application $app) {
         return $app['twig']->render('home.twig', array());
+    }
+
+    public function ownServerAction(Application $app) {
+        $provider = new OwnServerProvider(array(
+            'clientId' => 1,
+            'clientSecret' => 'secret',
+            'redirectUri' => 'http://localhost:8080/own'
+        ));
+
+        if (!$app['session']->get('ownToken') || $app['session']->get('ownToken')->expires <= time()) {
+            if (!$app['request']->get('code')) {
+                $authUrl = $provider->getAuthorizationUrl();
+                $app['session']->set('oauth2state', $provider->state);
+                $app['session']->remove('ownToken');
+
+                return $app->redirect($authUrl);
+
+            } elseif (!$app['request']->get('state') || $app['request']->get('state') !== $app['session']->get('oauth2state')) {
+                $app['session']->remove('oauth2state');
+                $app['session']->remove('ownToken');
+
+                throw new AccessDeniedException('OwnServer');
+            }
+
+            $token = $provider->getAccessToken('authorization_code', array('code' => $app['request']->get('code')));
+            $app['session']->set('ownToken', $token);
+        }
+
+        $userDetails = $provider->getUserDetails($app['session']->get('ownToken'));
+        return $app['twig']->render('ownServer.twig', array('user' => $userDetails));
     }
 
     public function googleAction(Application $app) {
@@ -32,24 +63,24 @@ class DefaultController {
         if (!$app['request']->get('code')) {
             $authUrl = $provider->getAuthorizationUrl();
             $app['session']->set('oauth2state', $provider->state);
-            $app['session']->remove('token');
+            $app['session']->remove('googleToken');
 
             return $app->redirect($authUrl);
 
         } elseif (!$app['request']->get('state') || $app['request']->get('state') !== $app['session']->get('oauth2state')) {
             $app['session']->remove('oauth2state');
-            $app['session']->remove('token');
+            $app['session']->remove('googleToken');
 
             throw new AccessDeniedException('Google');
         }
 
-        if (!$app['session']->get('token')) {
+        if (!$app['session']->get('googleToken')) {
             $token = $provider->getAccessToken('authorization_code', array('code' => $app['request']->get('code')));
-            $app['session']->set('token', $token);
+            $app['session']->set('googleToken', $token);
         }
 
-        $userDetails = $provider->getUserDetails($app['session']->get('token'));
-        $mailDetails = $provider->getUserEmails($app['session']->get('token'));
+        $userDetails = $provider->getUserDetails($app['session']->get('googleToken'));
+        $mailDetails = $provider->getUserEmails($app['session']->get('googleToken'));
 
         return $app['twig']->render('google.twig', array('user' => $userDetails, 'mails' => $mailDetails));
     }

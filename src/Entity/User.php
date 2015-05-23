@@ -34,6 +34,18 @@ class User implements UserInterface {
 
     /**
      * @type string
+     * @ORM\Column(type="string", length=100)
+     */
+    protected $name;
+
+    /**
+     * @type string
+     * @ORM\Column(type="string", length=100)
+     */
+    protected $email;
+
+    /**
+     * @type string
      * @ORM\Column(type="string")
      */
     protected $password;
@@ -96,6 +108,34 @@ class User implements UserInterface {
      */
     public function setUsername($username) {
         $this->username = $username;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name) {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail() {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     */
+    public function setEmail($email) {
+        $this->email = $email;
     }
 
     /**

@@ -3,6 +3,7 @@
 
 namespace Dave\Libraries\OAuth2Server;
 
+use Dave\Entity\Session;
 use League\OAuth2\Server\Entity\SessionEntity;
 use League\OAuth2\Server\Storage\AbstractStorage;
 use League\OAuth2\Server\Storage\ClientInterface;
@@ -48,6 +49,9 @@ class ClientStorage extends AbstractStorage implements ClientInterface {
      * @return \League\OAuth2\Server\Entity\ClientEntity | null
      */
     public function getBySession(SessionEntity $session) {
+        if (!$session instanceof Session) {
+            $session = $this->app['orm.em']->getRepository('Dave\Entity\Session')->find($session->getId());
+        }
         return $session->getClient();
     }
 
