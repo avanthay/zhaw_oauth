@@ -10,6 +10,7 @@ use Dave\Libraries\OAuth2Server\ScopeStorage;
 use Dave\Libraries\OAuth2Server\SessionStorage;
 use Dave\Provider\ControllerProvider;
 use Dave\Provider\ServiceProvider;
+use Dave\Provider\UserProvider;
 use Doctrine\ORM\Tools\SchemaTool;
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\Grant\AuthCodeGrant;
@@ -44,11 +45,9 @@ class App extends Application {
                     'pattern' => '(^/admin|^/oauth/authorize)',
                     'form'    => array('login_path' => '/login', 'check_path' => '/admin/login_check'),
                     'logout'  => array('logout_path' => '/admin/logout'),
-                    'users'   => array(
-                        // raw password is foo
-                        'admin' => array('ROLE_ADMIN', '5FZ2Z8QIkA7UTZ4BYkoC+GsReLf569mSKDsfods6LYQ8t+a8EW9oaircfMpmaLbPBh4FOBiiFyLfuZmTSUwzZg=='),
-                        'user'  => array('ROLE_USER', '5FZ2Z8QIkA7UTZ4BYkoC+GsReLf569mSKDsfods6LYQ8t+a8EW9oaircfMpmaLbPBh4FOBiiFyLfuZmTSUwzZg==')
-                    )
+                    'users'   => $app->share(function() use ($app) {
+                        return new UserProvider($app);
+                    })
                 ),
                 'default' => array(
                     'anonymous' => true
